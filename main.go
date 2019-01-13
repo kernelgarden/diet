@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/kernelgarden/diet/constant"
 	"log"
 	"os"
 	"runtime"
@@ -31,9 +30,9 @@ func main() {
 	// Init DB
 	var dbURI string
 	if c.Debug {
-		dbURI = fmt.Sprintf("%s:%s@/%s_dev?charset=utf8", constant.DBUserName, constant.DBPassWord, constant.DBName)
+		dbURI = fmt.Sprintf("%s:%s@/%s_dev?charset=utf8", c.Database.Username, c.Database.Password, c.Database.Name)
 	} else {
-		dbURI = fmt.Sprintf("%s:%s@/%s?charset=utf8", constant.DBUserName, constant.DBPassWord, constant.DBName)
+		dbURI = fmt.Sprintf("%s:%s@/%s?charset=utf8", c.Database.Username, c.Database.Password, c.Database.Name)
 	}
 
 	var dbType string
@@ -90,16 +89,19 @@ func initDB(driver, connection string) (*xorm.Engine, error) {
 
 type Config struct {
 	Database struct {
-		Driver string
-		Logger string
+		Driver   string
+		Username string
+		Password string
+		Name     string
+		Logger   string
 	}
 
 	Behaviorlog struct {
 		Kafka string
 	}
 
-	Debug bool
-	Service string
+	Debug    bool
+	Service  string
 	Httpport string
 }
 

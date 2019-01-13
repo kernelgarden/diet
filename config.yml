@@ -1,5 +1,8 @@
 database:
   driver: mysql
+  username: root
+  password: tabstorage
+  name: diet
   logger:
   # kafka:
   #   brokers:
