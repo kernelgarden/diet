@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"runtime"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/go-xorm/xorm"
 	"github.com/kernelgarden/diet/router"
 	"github.com/kernelgarden/goutils/config"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/kernelgarden/diet/factory"
 )
 
 func main() {
@@ -42,7 +41,7 @@ func main() {
 		dbType = c.Database.Driver
 	}
 
-	db, err := initDB(dbType, dbURI)
+	db, err := factory.InitDB(dbType, dbURI)
 	if err != nil {
 		panic(err)
 	}
@@ -70,21 +69,6 @@ func main() {
 	if err := e.Start(fmt.Sprintf(":%s", port)); err != nil {
 		log.Println(err)
 	}
-}
-
-func initDB(driver, connection string) (*xorm.Engine, error) {
-	db, err := xorm.NewEngine(driver, connection)
-	if err != nil {
-		return nil, err
-	}
-
-	if driver == "sqlite3" {
-		runtime.GOMAXPROCS(1)
-	}
-
-	// TODO: sync db with model
-
-	return db, nil
 }
 
 type Config struct {

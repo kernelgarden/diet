@@ -1,3 +1,3 @@
 package constant
 
-var DBName = "diet"
+var DbCtxName = "db_ctx"
