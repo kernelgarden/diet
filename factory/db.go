@@ -1,19 +1,45 @@
 package factory
 
 import (
-	"context"
-	"github.com/go-xorm/xorm"
-	"github.com/labstack/echo"
-	"github.com/kernelgarden/diet/constant"
+	"errors"
 	"fmt"
+	"github.com/go-xorm/xorm"
+	"github.com/kernelgarden/diet/constant"
 	"runtime"
-	"github.com/kernelgarden/diet/models"
+	"sync"
 )
 
 var db *xorm.Engine
+var once sync.Once
 
-func InitDB(driver, connection string) (*xorm.Engine, error) {
-	db, err := xorm.NewEngine(driver, connection)
+func InitDB() (*xorm.Engine, error) {
+	config := constant.GlobalCtx.Value(constant.CtxConfig)
+	if config == nil {
+		return nil, errors.New("config file is empty")
+	}
+
+	c, isValid := config.(*constant.Config)
+	if !isValid {
+		return nil, errors.New("config file is broken")
+	}
+
+	// Init DB
+	var connection string
+	if c.Debug {
+		connection = fmt.Sprintf("%s:%s@/%s_dev?charset=utf8", c.Database.Username, c.Database.Password, c.Database.Name)
+	} else {
+		connection = fmt.Sprintf("%s:%s@/%s?charset=utf8", c.Database.Username, c.Database.Password, c.Database.Name)
+	}
+
+	var driver string
+	if c.Database.Driver == "" {
+		driver = "mysql"
+	} else {
+		driver = c.Database.Driver
+	}
+
+	var err error
+	db, err = xorm.NewEngine(driver, connection)
 	if err != nil {
 		return nil, err
 	}
@@ -22,18 +48,16 @@ func InitDB(driver, connection string) (*xorm.Engine, error) {
 		runtime.GOMAXPROCS(1)
 	}
 
-	db.Sync(new(models.Brand))
-	db.Sync(new(models.Category))
-	db.Sync(new(models.Food))
-	db.Sync(new(models.Nutrient))
-
 	return db, nil
 }
 
 func DB() xorm.Interface {
-	if db == nil {
-		panic("cannot use DB")
-	}
+	once.Do(func() {
+		_, err := InitDB()
+		if err != nil {
+			panic("cannot connect to DB")
+		}
+	})
 
 	return db
 }

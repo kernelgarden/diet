@@ -1,16 +1,21 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"fmt"
+	"github.com/go-xorm/xorm"
+	"github.com/kernelgarden/diet/constant"
+	"github.com/kernelgarden/diet/models"
 	"log"
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/kernelgarden/diet/factory"
 	"github.com/kernelgarden/diet/router"
 	"github.com/kernelgarden/goutils/config"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"github.com/kernelgarden/diet/factory"
 )
 
 func main() {
@@ -20,32 +25,19 @@ func main() {
 		panic(err)
 	}
 
-	var c Config
+	var c constant.Config
 	err = config.Read(curPath, "config", &c)
 	if err != nil {
 		panic(err)
 	}
+	constant.GlobalCtx = context.WithValue(constant.GlobalCtx, constant.CtxConfig, &c)
 
-	// Init DB
-	var dbURI string
-	if c.Debug {
-		dbURI = fmt.Sprintf("%s:%s@/%s_dev?charset=utf8", c.Database.Username, c.Database.Password, c.Database.Name)
-	} else {
-		dbURI = fmt.Sprintf("%s:%s@/%s?charset=utf8", c.Database.Username, c.Database.Password, c.Database.Name)
-	}
-
-	var dbType string
-	if c.Database.Driver == "" {
-		dbType = "mysql"
-	} else {
-		dbType = c.Database.Driver
-	}
-
-	db, err := factory.InitDB(dbType, dbURI)
-	if err != nil {
+	db := factory.DB()
+	if db == nil {
 		panic(err)
 	}
-	defer db.Close()
+	defer db.(*xorm.Engine).Close()
+	Sync()
 
 	e := echo.New()
 
@@ -71,22 +63,29 @@ func main() {
 	}
 }
 
-type Config struct {
-	Database struct {
-		Driver   string
-		Username string
-		Password string
-		Name     string
-		Logger   string
+func Sync() error {
+	db, err := factory.DB().(*xorm.Engine)
+	if !err {
+		return errors.New("cannot sync models with DB")
 	}
 
-	Behaviorlog struct {
-		Kafka string
-	}
+	CheckErr(db.Sync(new(models.Brand)))
+	CheckErr(db.Sync(new(models.Category)))
+	CheckErr(db.Sync(new(models.Food)))
+	CheckErr(db.Sync(new(models.Nutrient)))
+	/*
+	CheckErr(db.Sync(new(models.BrandFood)))
+	CheckErr(db.Sync(new(models.CategoryFood)))
+	CheckErr(db.Sync(new(models.FoodNutrient)))
+	*/
 
-	Debug    bool
-	Service  string
-	Httpport string
+	return nil
+}
+
+func CheckErr(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
 
 func getCurPath() (string, error) {

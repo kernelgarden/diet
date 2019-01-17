@@ -34,5 +34,5 @@ func (f Food) Update() error {
 }
 
 func (f Food) Delete() error {
-
+	return nil
 }
