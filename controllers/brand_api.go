@@ -18,6 +18,7 @@ func (b BrandApiController) Init(g *echo.Group) {
 	g.POST("", b.GetList)
 	g.POST("/page", b.GetPage)
 	g.GET("/dummy", b.CreateDummy)
+	g.DELETE("", b.Delete)
 }
 
 func (BrandApiController) GetById(ctx echo.Context) error {
@@ -89,11 +90,32 @@ func (BrandApiController) GetPage(ctx echo.Context) error {
 	return Success(ctx, result)
 }
 
+type BrandCreateInput struct {
+}
+type BrandCreateOutput struct {
+	Brand 	models.Brand	`json:"result"`
+}
 func (BrandApiController) Create(ctx echo.Context) error {
+
+
 	return Success(ctx, nil)
 }
 
+type BrandDeleteInput struct {
+	id	int64	`json:"id"`
+}
 func (BrandApiController) Delete(ctx echo.Context) error {
+	// TODO: Add custom validator and binder
+	var input BrandDeleteInput
+	if err := ctx.Bind(&input); err != nil {
+		return Fail(ctx, http.StatusBadRequest, factory.NewFailResp(constant.InvalidRequestFormat))
+	}
+
+	err := models.Brand{}.Delete(input.id)
+	if err != nil {
+		return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.Unknown))
+	}
+
 	return Success(ctx, nil)
 }
 
