@@ -56,3 +56,9 @@ func (Category) Delete(id int64) error {
 	_, err := factory.DB().ID(id).Delete(&Category{})
 	return err
 }
+
+func (Category) Default() (*Category, error) {
+	var c Category
+	_, err := factory.DB().ID(0).Get(&c)
+	return &c, err
+}

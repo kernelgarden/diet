@@ -20,7 +20,7 @@ func (f FoodApiController) Init(g echoswagger.ApiGroup) {
 
 	g.POST("", f.Create).
 		AddParamQueryNested(FoodCreateInput{}).
-		AddResponse(http.StatusOK, "생성된 food의 정보를 반환합니다.", models.Food{}, nil)
+		AddResponse(http.StatusOK, "생성된 food의 정보를 반환합니다.", FoodCreateOutput{}, nil)
 
 	g.GET("/:id", f.GetById).
 		AddParamQueryNested(FoodGetByIdInput{}).
@@ -76,7 +76,7 @@ type FoodGetListInput struct {
 	IdList	[]int64	`json:"id_list" swagger:"desc(조회할 food의 ID 리스트),required"`
 }
 type FoodGetListOutput struct {
-	FoodList []*models.Food	`json:"food_list"`
+	FoodList []FoodGetByIdOutput	`json:"food_list"`
 }
 func (FoodApiController) GetList(ctx echo.Context) error {
 	var input FoodGetListInput
@@ -84,7 +84,7 @@ func (FoodApiController) GetList(ctx echo.Context) error {
 		return Fail(ctx, http.StatusBadRequest, factory.NewFailResp(constant.InvalidRequestFormat))
 	}
 
-	foodList := make([]*models.Food, len(input.IdList))
+	foodList := make([]FoodGetByIdOutput, len(input.IdList))
 	for idx, id := range input.IdList {
 		food, err := models.Food{}.Get(id)
 		if err != nil {
@@ -93,7 +93,16 @@ func (FoodApiController) GetList(ctx echo.Context) error {
 			return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.InExist))
 		}
 
-		foodList[idx] = food
+		var nutrient models.Nutrient
+		if has, err := factory.DB().Where("food_id = ?", food.Id).Get(&nutrient); err != nil {
+			return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.Unknown))
+		} else if !has  {
+			return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.InExist))
+		}
+
+		foodOutput := FoodGetByIdOutput{Food: *food, Nutrient: nutrient}
+
+		foodList[idx] = foodOutput
 	}
 
 	result := FoodGetListOutput{FoodList: foodList}
@@ -119,7 +128,8 @@ func (FoodApiController) GetPage(ctx echo.Context) error {
 		return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.Unknown))
 	}
 
-	result := FoodGetListOutput{FoodList: foodList}
+	//TODO: change this
+	result := FoodGetPageOutput{FoodList: foodList}
 
 	return Success(ctx, result)
 }
@@ -137,6 +147,10 @@ type FoodCreateInput struct {
 	TransFat       float32   `json:"trans_fat" swagger:"desc(생성할 food의 트랜스지방(g)),required"`
 	PerWeight      int32     `json:"per_weight" swagger:"desc(생성할 food의 중량(g)),requried"`
 	Calorie        int64     `json:"calorie" swagger:"desc(생성할 food의 칼로리(kcal)),required"`
+}
+type FoodCreateOutput struct {
+	Food models.Food			`json:"food"`
+	Nutrient models.Nutrient	`json:"nutrient"`
 }
 func (FoodApiController) Create(ctx echo.Context) error {
 	var input FoodCreateInput
@@ -164,8 +178,9 @@ func (FoodApiController) Create(ctx echo.Context) error {
 		return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.Unknown))
 	}
 
+	result := FoodCreateOutput{Food: newFood, Nutrient: newNutrient}
 
-	return Success(ctx, newFood)
+	return Success(ctx, result)
 }
 
 type FoodDeleteInput struct {

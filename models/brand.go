@@ -58,3 +58,12 @@ func (Brand) Delete(id int64) error {
 	_, err := factory.DB().ID(id).Delete(&Brand{})
 	return err
 }
+
+func (Brand) Default() (*Brand, error) {
+	var b Brand
+	if _, err := factory.DB().ID(0).Get(&b); err != nil {
+		return nil, err
+	}
+
+	return &b, nil
+}
