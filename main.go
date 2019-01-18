@@ -49,6 +49,8 @@ func main() {
 	e.Use(middleware.CORS())
 	e.Use(middleware.RequestID())
 
+	//TODO: Implement log system
+
 	e.Debug = c.Debug
 
 	var port string
@@ -73,11 +75,6 @@ func Sync() error {
 	CheckErr(db.Sync(new(models.Category)))
 	CheckErr(db.Sync(new(models.Food)))
 	CheckErr(db.Sync(new(models.Nutrient)))
-	/*
-	CheckErr(db.Sync(new(models.BrandFood)))
-	CheckErr(db.Sync(new(models.CategoryFood)))
-	CheckErr(db.Sync(new(models.FoodNutrient)))
-	*/
 
 	return nil
 }

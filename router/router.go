@@ -18,5 +18,4 @@ func InitRoutes(e *echo.Echo) {
 	controllers.BrandApiController{}.Init(r.Group("Brand", "/api/brands"))
 	controllers.CategoryApiController{}.Init(r.Group("Category", "/api/categories"))
 	controllers.FoodApiController{}.Init(r.Group("Food", "/api/foods"))
-	controllers.NutrientApiController{}.Init(r.Group("Nutrient", "/api/nutrients"))
 }
