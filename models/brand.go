@@ -19,6 +19,10 @@ type BrandFood struct {
 	Food	`xorm:"extends"`
 }
 
+func (BrandFood) TableName() string {
+	return "food"
+}
+
 func (b *Brand) Create() (int64, error) {
 	return factory.DB().Insert(b)
 }

@@ -1,10 +1,13 @@
 package models
 
-import "time"
+import (
+	"github.com/kernelgarden/diet/factory"
+	"time"
+)
 
 type Nutrient struct {
 	Id             int64     `json:"id" xorm:"pk autoincr"`
-	FoodId         int64     `xorm:"index"`
+	FoodId         int64     `json:"food_id" xorm:"index"`
 	Carbohydrate   float32   `json:"carbohydrate"`
 	Protein        float32   `json:"protein"`
 	SaturatedFat   float32   `json:"saturated_fat"`
@@ -14,4 +17,40 @@ type Nutrient struct {
 	Calorie        int64     `json:"calorie"`
 	CreatedAt      time.Time `json:"created_at" xorm:"created"`
 	DeletedAt      time.Time `json:"deleted_at" xorm:"deleted"`
+}
+
+func (n *Nutrient) Create() (int64, error) {
+	return factory.DB().Insert(n)
+}
+
+func (Nutrient) Get(id int64) (*Nutrient, error) {
+	var n Nutrient
+	if has, err := factory.DB().ID(id).Get(&n); err != nil {
+		return &n, err
+	} else if !has {
+		return nil, nil
+	}
+
+	return &n, nil
+}
+
+func (Nutrient) GetAll(offset, limit int) ([]*Nutrient, error) {
+	// TODO: Increase performance via goroutine
+	nutrients := make([]*Nutrient, 0)
+
+	if err := factory.DB().Limit(limit, offset).Find(&nutrients); err != nil {
+		return nil, err
+	}
+
+	return nutrients, nil
+}
+
+func (n *Nutrient) Update() error {
+	_, err := factory.DB().ID(n.Id).Update(n)
+	return err
+}
+
+func (Nutrient) Delete(id int64) error {
+	_, err := factory.DB().ID(id).Delete(&Nutrient{})
+	return err
 }

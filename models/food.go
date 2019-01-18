@@ -1,11 +1,14 @@
 package models
 
-import "time"
+import (
+	"github.com/kernelgarden/diet/factory"
+	"time"
+)
 
 type Food struct {
 	Id         int64     `json:"id" xorm:"pk autoincr"`
-	CategoryId int64     `xorm:"index"`
-	BrandId    int64     `xorm:"index"`
+	CategoryId int64     `json:"category_id" xorm:"index"`
+	BrandId    int64     `json:"brand_id" xorm:"index"`
 	Name       string    `json:"name" xorm:"varchar(64)"`
 	Weight     float64   `json:"weight"`
 	CreatedAt  time.Time `json:"created_at" xorm:"created"`
@@ -17,22 +20,42 @@ type FoodNutrient struct {
 	Nutrient `xorm:"extends"`
 }
 
-func (f *Food) Create() error {
-	return nil
+func (FoodNutrient) TableName() string {
+	return "nutrient"
 }
 
-func (f *Food) GetAll() error {
-	return nil
+func (f *Food) Create() (int64, error) {
+	return factory.DB().Insert(f)
 }
 
-func (f *Food) Get(id int) error {
-	return nil
+func (Food) Get(id int64) (*Food, error) {
+	var f Food
+	if has, err := factory.DB().ID(id).Get(&f); err != nil {
+		return &f, err
+	} else if !has {
+		return nil, nil
+	}
+
+	return &f, nil
 }
 
-func (f Food) Update() error {
-	return nil
+func (Food) GetAll(offset, limit int) ([]*Food, error) {
+	// TODO: Increase performance via goroutine
+	foods := make([]*Food, 0)
+
+	if err := factory.DB().Limit(limit, offset).Find(&foods); err != nil {
+		return nil, err
+	}
+
+	return foods, nil
 }
 
-func (f Food) Delete() error {
-	return nil
+func (f *Food) Update() error {
+	_, err := factory.DB().ID(f.Id).Update(f)
+	return err
+}
+
+func (Food) Delete(id int64) error {
+	_, err := factory.DB().ID(id).Delete(&Food{})
+	return err
 }
