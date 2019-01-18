@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/go-xorm/xorm"
 	"github.com/kernelgarden/diet/factory"
 	"time"
 )
@@ -28,6 +29,10 @@ func (f *Food) Create() (int64, error) {
 	return factory.DB().Insert(f)
 }
 
+func (f *Food) CreateWithSes(session *xorm.Session) (int64, error) {
+	return session.Insert(f)
+}
+
 func (Food) Get(id int64) (*Food, error) {
 	var f Food
 	if has, err := factory.DB().ID(id).Get(&f); err != nil {
@@ -52,6 +57,11 @@ func (Food) GetAll(offset, limit int) ([]*Food, error) {
 
 func (f *Food) Update() error {
 	_, err := factory.DB().ID(f.Id).Update(f)
+	return err
+}
+
+func (f *Food) UpdateWithSes(session *xorm.Session) error {
+	_, err := session.ID(f.Id).Update(f)
 	return err
 }
 

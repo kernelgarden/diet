@@ -5,6 +5,7 @@ import (
 	"github.com/kernelgarden/diet/factory"
 	"github.com/kernelgarden/diet/models"
 	"github.com/labstack/echo"
+	"github.com/pangpanglabs/echoswagger"
 	"net/http"
 	"strconv"
 )
@@ -12,11 +13,15 @@ import (
 type NutrientApiController struct {
 }
 
-func (n NutrientApiController) Init(g *echo.Group) {
+func (n NutrientApiController) Init(g echoswagger.ApiGroup) {
+	g.POST("", n.Create)
+
 	g.GET("/:id", n.GetById)
-	g.POST("", n.GetList)
+	g.POST("/list", n.GetList)
 	g.GET("/page", n.GetPage)
+
 	g.PUT("/:id", n.Update)
+
 	g.DELETE("", n.Delete)
 }
 

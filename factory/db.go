@@ -62,7 +62,7 @@ func DB() xorm.Interface {
 	return db
 }
 
-func Transaction(queryExec func() error) error {
+func Transaction(queryExec func(session *xorm.Session) error) error {
 	session := db.NewSession()
 	defer session.Close()
 
@@ -70,7 +70,8 @@ func Transaction(queryExec func() error) error {
 		return err
 	}
 
-	if err := queryExec(); err != nil {
+	if err := queryExec(session); err != nil {
+		session.Rollback()
 		return err
 	}
 

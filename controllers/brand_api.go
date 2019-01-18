@@ -6,6 +6,7 @@ import (
 	"github.com/kernelgarden/diet/factory"
 	"github.com/kernelgarden/diet/models"
 	"github.com/labstack/echo"
+	"github.com/pangpanglabs/echoswagger"
 	"net/http"
 	"strconv"
 )
@@ -13,20 +14,39 @@ import (
 type BrandApiController struct {
 }
 
-func (b BrandApiController) Init(g *echo.Group) {
-	g.GET("/:id", b.GetById)
-	g.POST("", b.GetList)
-	g.GET("/page", b.GetPage)
+func (b BrandApiController) Init(g echoswagger.ApiGroup) {
+	g.POST("", b.Create).
+		AddParamQueryNested(BrandCreateInput{}).
+		AddResponse(http.StatusOK, "생성된 brand의 정보를 반환합니다.", models.Brand{}, nil)
 	g.GET("/dummy", b.CreateDummy)
-	g.PUT("/:id", b.Update)
-	g.DELETE("", b.Delete)
+
+	g.GET("/:id", b.GetById).
+		AddParamQueryNested(BrandGetByIdInput{}).
+		AddResponse(http.StatusOK, "조회할 brand의 정보를 반환합니다.", models.Brand{}, nil)
+	g.POST("/list", b.GetList).
+		AddParamBody(BrandGetListInput{}, "body", "", true).
+		AddResponse(http.StatusOK, "조회할 brand 정보들의 리스트를 반환합니다.", BrandGetListOutput{}, nil)
+	g.GET("/page", b.GetPage).
+		AddParamQueryNested(BrandGetPageInput{}).
+		AddResponse(http.StatusOK, "조회할 brand 정보들의 페이지를 반환합니다.", BrandGetPageOutput{}, nil)
+
+
+	g.PUT("/:id", b.Update).
+		AddParamQueryNested(BrandUpdateInput{}).
+		AddResponse(http.StatusOK, "", nil, nil)
+
+	g.DELETE("", b.Delete).
+		AddParamQueryNested(BrandDeleteInput{}).
+		AddResponse(http.StatusOK, "", nil, nil)
 }
 
 // TODO: add validator
 
+type BrandGetByIdInput struct {
+	Id	int64	`query:"id" swagger:"desc(조회할 brand의 ID),required"`
+}
 func (BrandApiController) GetById(ctx echo.Context) error {
-	param := ctx.Param("id")
-	id, err := strconv.ParseInt(param, 10, 64)
+	id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
 	if err != nil {
 		return Fail(ctx, http.StatusBadRequest, factory.NewFailResp(constant.InvalidRequestFormat))
 	}
@@ -42,7 +62,7 @@ func (BrandApiController) GetById(ctx echo.Context) error {
 }
 
 type BrandGetListInput struct {
-	IdList	[]int64	`json:"id_list"`
+	IdList	[]int64	`json:"id_list" swagger:"desc(조회할 대상의 ID 리스트),required"`
 }
 type BrandGetListOutput struct {
 	BrandList	[]*models.Brand `json:"brand_list"`
@@ -53,8 +73,8 @@ func (BrandApiController) GetList(ctx echo.Context) error {
 		return Fail(ctx, http.StatusBadRequest, factory.NewFailResp(constant.InvalidRequestFormat))
 	}
 
-	brandList := make([]*models.Brand, 0)
-	for _, id := range input.IdList {
+	brandList := make([]*models.Brand, len(input.IdList))
+	for idx, id := range input.IdList {
 		brand, err := models.Brand{}.Get(id)
 		if err != nil {
 			return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.Unknown))
@@ -62,7 +82,7 @@ func (BrandApiController) GetList(ctx echo.Context) error {
 			return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.InExist))
 		}
 
-		brandList = append(brandList, brand)
+		brandList[idx] = brand
 	}
 
 	result := BrandGetListOutput{BrandList: brandList}
@@ -71,8 +91,8 @@ func (BrandApiController) GetList(ctx echo.Context) error {
 }
 
 type BrandGetPageInput struct {
-	Limit	int	`query:"limit"`
-	Offset	int `query:"offset"`
+	Limit	int	`query:"limit" swagger:"desc(조회할 brand의 개수),required"`
+	Offset	int `query:"offset" swagger:"desc(조회를 시작할 offset),required"`
 }
 type BrandGetPageOutput struct {
 	BrandList	[]*models.Brand	`json:"brand_list"`
@@ -94,18 +114,27 @@ func (BrandApiController) GetPage(ctx echo.Context) error {
 }
 
 type BrandCreateInput struct {
-}
-type BrandCreateOutput struct {
-	Brand 	models.Brand	`json:"result"`
+	Name       string    `json:"name" swagger:"desc(등록할 이름),required"`
+	ImgSrc     string    `json:"img_url" swagger:"desc(등록할 이미지 주소),required"`
+	CategoryId int64     `json:"category_id" swagger:"desc(등록할 카테고리 ID),required"`
 }
 func (BrandApiController) Create(ctx echo.Context) error {
+	var input BrandCreateInput
+	if err := ctx.Bind(&input); err != nil {
+		return Fail(ctx, http.StatusBadRequest, factory.NewFailResp(constant.InvalidRequestFormat))
+	}
 
+	newBrand := models.Brand{Name: input.Name, ImgSrc: input.ImgSrc, CategoryId: input.CategoryId}
+	_, err := newBrand.Create()
+	if err != nil {
+		return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.Unknown))
+	}
 
-	return Success(ctx, nil)
+	return Success(ctx, newBrand)
 }
 
 type BrandDeleteInput struct {
-	Id	int64	`query:"id"`
+	Id	int64	`query:"id" swagger:"desc(삭제할 brand의 ID),required"`
 }
 func (BrandApiController) Delete(ctx echo.Context) error {
 	var input BrandDeleteInput
@@ -122,9 +151,9 @@ func (BrandApiController) Delete(ctx echo.Context) error {
 }
 
 type BrandUpdateInput struct {
-	Name       string    `json:"name"`
-	ImgSrc     string    `json:"img_url"`
-	CategoryId int64     `json:"category_id"`
+	Name       string    `json:"name" swagger:"desc(변경할 이름(보내지 않으면 적용 X)),allowEmpty"`
+	ImgSrc     string    `json:"img_url" swagger:"desc(변경할 이미지 주소(보내지 않으면 적용 X)),allowEmpty"`
+	CategoryId int64     `json:"category_id" swagger:"desc(변경할 카테고리 ID(보내지 않으면 적용 X)),allowEmpty"`
 }
 func (BrandApiController) Update(ctx echo.Context) error {
 	id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/go-xorm/xorm"
 	"github.com/kernelgarden/diet/factory"
 	"time"
 )
@@ -21,6 +22,10 @@ type Nutrient struct {
 
 func (n *Nutrient) Create() (int64, error) {
 	return factory.DB().Insert(n)
+}
+
+func (n *Nutrient) CreateWithSes(session *xorm.Session) (int64, error) {
+	return session.Insert(n)
 }
 
 func (Nutrient) Get(id int64) (*Nutrient, error) {
@@ -47,6 +52,11 @@ func (Nutrient) GetAll(offset, limit int) ([]*Nutrient, error) {
 
 func (n *Nutrient) Update() error {
 	_, err := factory.DB().ID(n.Id).Update(n)
+	return err
+}
+
+func (n *Nutrient) UpdateWithSes(session *xorm.Session) error {
+	_, err := session.ID(n.Id).Update(n)
 	return err
 }
 
