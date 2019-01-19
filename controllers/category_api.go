@@ -38,8 +38,9 @@ func (c CategoryApiController) Init(g echoswagger.ApiGroup) {
 }
 
 type CategoryGetByIdInput struct {
-	Id	int64	`query:"id" swagger:"desc(조회할 category의 ID),required"`
+	Id int64 `query:"id" swagger:"desc(조회할 category의 ID),required"`
 }
+
 func (CategoryApiController) GetById(ctx echo.Context) error {
 	param := ctx.Param("id")
 	id, err := strconv.ParseInt(param, 10, 64)
@@ -58,11 +59,12 @@ func (CategoryApiController) GetById(ctx echo.Context) error {
 }
 
 type CategoryGetListInput struct {
-	IdList	[]int64	`json:"id_list" swagger:"desc(조회할 category ID 리스트),required"`
+	IdList []int64 `json:"id_list" swagger:"desc(조회할 category ID 리스트),required"`
 }
 type CategoryGetListOutput struct {
-	CategoryList	[]*models.Category `json:"category_list"`
+	CategoryList []*models.Category `json:"category_list"`
 }
+
 func (CategoryApiController) GetList(ctx echo.Context) error {
 	var input CategoryGetListInput
 	if err := ctx.Bind(&input); err != nil {
@@ -87,12 +89,13 @@ func (CategoryApiController) GetList(ctx echo.Context) error {
 }
 
 type CategoryGetPageInput struct {
-	Limit	int	`query:"limit" swagger:"desc(조회할 category의 개수),required"`
-	Offset	int `query:"offset" swagger:"desc(조회를 시작할 offset),required"`
+	Limit  int `query:"limit" swagger:"desc(조회할 category의 개수),required"`
+	Offset int `query:"offset" swagger:"desc(조회를 시작할 offset),required"`
 }
 type CategoryGetPageOutput struct {
 	CategoryList []*models.Category `json:"category_list"`
 }
+
 func (CategoryApiController) GetPage(ctx echo.Context) error {
 	var input CategoryGetPageInput
 	if err := ctx.Bind(&input); err != nil {
@@ -110,8 +113,9 @@ func (CategoryApiController) GetPage(ctx echo.Context) error {
 }
 
 type CategoryCreateInput struct {
-	Name      string    `json:"name" swagger:"desc(생성할 category의 이름),required"`
+	Name string `json:"name" swagger:"desc(생성할 category의 이름),required"`
 }
+
 func (CategoryApiController) Create(ctx echo.Context) error {
 	var input CategoryCreateInput
 	if err := ctx.Bind(&input); err != nil {
@@ -128,8 +132,9 @@ func (CategoryApiController) Create(ctx echo.Context) error {
 }
 
 type CategoryDeleteInput struct {
-	Id	int64	`query:"id" swagger:"desc(삭제할 category의 ID),required"`
+	Id int64 `query:"id" swagger:"desc(삭제할 category의 ID),required"`
 }
+
 func (CategoryApiController) Delete(ctx echo.Context) error {
 	var input CategoryDeleteInput
 	if err := ctx.Bind(&input); err != nil {
@@ -145,8 +150,9 @@ func (CategoryApiController) Delete(ctx echo.Context) error {
 }
 
 type CategoryUpdateInput struct {
-	Name      string    `json:"name" swagger:"desc(변경할 category 이름(보내지 않으면 적용X)),allowEmpty"`
+	Name string `json:"name" swagger:"desc(변경할 category 이름(보내지 않으면 적용X)),allowEmpty"`
 }
+
 func (CategoryApiController) Update(ctx echo.Context) error {
 	id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
 	if err != nil {

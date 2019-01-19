@@ -10,9 +10,9 @@ func InitRoutes(e *echo.Echo) {
 	controllers.HelloController{}.Init(e.Group("/hello"))
 
 	r := echoswagger.New(e, "", "/doc", &echoswagger.Info{
-		Title:	"Programmer-Diet",
+		Title:       "Programmer-Diet",
 		Description: "프로그래머는 다이어트를 어떻게 하는가에 대한 API 문서이다.",
-		Version: "0.1",
+		Version:     "0.1",
 	})
 
 	controllers.BrandApiController{}.Init(r.Group("Brand", "/api/brands"))

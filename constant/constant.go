@@ -20,4 +20,3 @@ type Config struct {
 	Service  string
 	Httpport string
 }
-

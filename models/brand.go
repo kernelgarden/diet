@@ -1,8 +1,8 @@
 package models
 
 import (
-	"time"
 	"github.com/kernelgarden/diet/factory"
+	"time"
 )
 
 type Brand struct {
@@ -15,8 +15,8 @@ type Brand struct {
 }
 
 type BrandFood struct {
-	Brand	`xorm:"extends"`
-	Food	`xorm:"extends"`
+	Brand `xorm:"extends"`
+	Food  `xorm:"extends"`
 }
 
 func (BrandFood) TableName() string {
