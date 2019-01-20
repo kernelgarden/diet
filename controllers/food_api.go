@@ -16,15 +16,13 @@ type FoodApiController struct {
 }
 
 func (f FoodApiController) Init(g echoswagger.ApiGroup) {
-	g.GET("/test/:id", f.Test)
-
 	g.POST("", f.Create).
 		AddParamQueryNested(FoodCreateInput{}).
-		AddResponse(http.StatusOK, "생성된 food의 정보를 반환합니다.", FoodCreateOutput{}, nil)
+		AddResponse(http.StatusOK, "생성된 food의 정보를 반환합니다.", models.FoodJSON{}, nil)
 
 	g.GET("/:id", f.GetById).
 		AddParamQueryNested(FoodGetByIdInput{}).
-		AddResponse(http.StatusOK, "조회할 food의 정보를 반환합니다.", FoodGetByIdOutput{}, nil)
+		AddResponse(http.StatusOK, "조회할 food의 정보를 반환합니다.", models.FoodJSON{}, nil)
 	g.POST("/list", f.GetList).
 		AddParamQueryNested(FoodGetListInput{}).
 		AddResponse(http.StatusOK, "조회할 food 정보들의 리스트를 반환합니다.", FoodGetListOutput{}, nil)
@@ -44,10 +42,6 @@ func (f FoodApiController) Init(g echoswagger.ApiGroup) {
 type FoodGetByIdInput struct {
 	Id int64 `json:"id" swagger:"desc(조회할 food의 id),required"`
 }
-type FoodGetByIdOutput struct {
-	Food     models.Food     `json:"food"`
-	Nutrient models.Nutrient `json:"nutrient"`
-}
 
 func (FoodApiController) GetById(ctx echo.Context) error {
 	param := ctx.Param("id")
@@ -63,12 +57,10 @@ func (FoodApiController) GetById(ctx echo.Context) error {
 		return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.InExist))
 	}
 
-	var nutrient models.Nutrient
-	if _, err := factory.DB().Where("food_id = ?", id).Get(&nutrient); err != nil {
+	result, err := food.ToJSON()
+	if err != nil {
 		return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.InExist))
 	}
-
-	result := FoodGetByIdOutput{Food: *food, Nutrient: nutrient}
 
 	return Success(ctx, result)
 }
@@ -77,7 +69,7 @@ type FoodGetListInput struct {
 	IdList []int64 `json:"id_list" swagger:"desc(조회할 food의 ID 리스트),required"`
 }
 type FoodGetListOutput struct {
-	FoodList []FoodGetByIdOutput `json:"food_list"`
+	FoodList []models.FoodJSON `json:"food_list"`
 }
 
 func (FoodApiController) GetList(ctx echo.Context) error {
@@ -86,7 +78,7 @@ func (FoodApiController) GetList(ctx echo.Context) error {
 		return Fail(ctx, http.StatusBadRequest, factory.NewFailResp(constant.InvalidRequestFormat))
 	}
 
-	foodList := make([]FoodGetByIdOutput, len(input.IdList))
+	foodList := make([]models.FoodJSON, len(input.IdList))
 	for idx, id := range input.IdList {
 		food, err := models.Food{}.Get(id)
 		if err != nil {
@@ -95,16 +87,12 @@ func (FoodApiController) GetList(ctx echo.Context) error {
 			return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.InExist))
 		}
 
-		var nutrient models.Nutrient
-		if has, err := factory.DB().Where("food_id = ?", food.Id).Get(&nutrient); err != nil {
-			return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.Unknown))
-		} else if !has {
+		foodOutput, err := food.ToJSON()
+		if err != nil {
 			return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.InExist))
 		}
 
-		foodOutput := FoodGetByIdOutput{Food: *food, Nutrient: nutrient}
-
-		foodList[idx] = foodOutput
+		foodList[idx] = *foodOutput
 	}
 
 	result := FoodGetListOutput{FoodList: foodList}
@@ -117,7 +105,7 @@ type FoodGetPageInput struct {
 	Offset int `query:"offset" swagger:"desc(조회를 시작할 offset),required"`
 }
 type FoodGetPageOutput struct {
-	FoodList []*models.Food `json:"food_list"`
+	FoodList []models.FoodJSON `json:"food_list"`
 }
 
 func (FoodApiController) GetPage(ctx echo.Context) error {
@@ -131,8 +119,17 @@ func (FoodApiController) GetPage(ctx echo.Context) error {
 		return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.Unknown))
 	}
 
-	//TODO: change this
-	result := FoodGetPageOutput{FoodList: foodList}
+	foodGetByIdOutputList := make([]models.FoodJSON, len(foodList))
+	for idx, food := range foodList {
+		output, err := food.ToJSON()
+		if err != nil {
+			return Fail(ctx, http.StatusBadRequest, factory.NewFailResp(constant.Unknown))
+		}
+
+		foodGetByIdOutputList[idx] = *output
+	}
+
+	result := FoodGetPageOutput{FoodList: foodGetByIdOutputList}
 
 	return Success(ctx, result)
 }
@@ -148,12 +145,8 @@ type FoodCreateInput struct {
 	SaturatedFat   float32 `json:"saturated_fat" swagger:"desc(생성할 food의 포화지방(g)),required"`
 	UnSaturatedFat float32 `json:"unsaturated_fat" swagger:"desc(생성할 food의 불포화지방(g)),required"`
 	TransFat       float32 `json:"trans_fat" swagger:"desc(생성할 food의 트랜스지방(g)),required"`
-	PerWeight      int32   `json:"per_weight" swagger:"desc(생성할 food의 중량(g)),requried"`
+	PerWeight      int32   `json:"per_weight" swagger:"desc(생성할 food의 중량(g)),required"`
 	Calorie        int64   `json:"calorie" swagger:"desc(생성할 food의 칼로리(kcal)),required"`
-}
-type FoodCreateOutput struct {
-	Food     models.Food     `json:"food"`
-	Nutrient models.Nutrient `json:"nutrient"`
 }
 
 func (FoodApiController) Create(ctx echo.Context) error {
@@ -183,7 +176,24 @@ func (FoodApiController) Create(ctx echo.Context) error {
 		return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.Unknown))
 	}
 
-	result := FoodCreateOutput{Food: newFood, Nutrient: newNutrient}
+	var category *models.Category
+	var brand *models.Brand
+
+	category, err = models.Category{}.Get(newFood.CategoryId)
+	if err != nil {
+		return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.Unknown))
+	} else if category == nil {
+		return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.InExist))
+	}
+
+	brand, err = models.Brand{}.Get(newFood.BrandId)
+	if err != nil {
+		return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.Unknown))
+	} else if category == nil {
+		return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.InExist))
+	}
+
+	result := models.FoodJSON{}.NewFoodJSON(newFood, newNutrient, *brand, *category)
 
 	return Success(ctx, result)
 }
@@ -252,8 +262,8 @@ func (FoodApiController) Update(ctx echo.Context) error {
 		food.Weight = input.Weight
 	}
 
-	var nutrient models.Nutrient
-	_, err = factory.DB().Where("food_id = ?", id).Get(&nutrient)
+	var nutrient *models.Nutrient
+	nutrient, err = models.Nutrient{}.Get(id)
 	if err != nil {
 		return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.InExist))
 	}

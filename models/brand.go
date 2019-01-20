@@ -10,8 +10,8 @@ type Brand struct {
 	Name       string    `json:"name"`
 	ImgSrc     string    `json:"img_url"`
 	CategoryId int64     `json:"category_id"`
-	CreatedAt  time.Time `json:"created_at" xorm:"created"`
-	DeletedAt  time.Time `json:"deleted_at" xorm:"deleted"`
+	CreatedAt  time.Time `json:"-" xorm:"created"`
+	DeletedAt  time.Time `json:"-" xorm:"deleted"`
 }
 
 type BrandFood struct {

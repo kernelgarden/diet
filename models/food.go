@@ -12,17 +12,43 @@ type Food struct {
 	BrandId    int64     `json:"brand_id" xorm:"index"`
 	Name       string    `json:"name" xorm:"varchar(64)"`
 	Weight     float64   `json:"weight"`
-	CreatedAt  time.Time `json:"created_at" xorm:"created"`
-	DeletedAt  time.Time `json:"deleted_at" xorm:"deleted"`
+	CreatedAt  time.Time `json:"-" xorm:"created"`
+	DeletedAt  time.Time `json:"-" xorm:"deleted"`
 }
 
-type FoodNutrient struct {
-	Food     `xorm:"extends"`
-	Nutrient `xorm:"extends"`
+type FoodJSON struct {
+	Food     Food     `json:"food"`
+	Nutrient Nutrient `json:"nutrient"`
+	Brand    Brand    `json:"brand"`
+	Category Category `json:"category"`
 }
 
-func (FoodNutrient) TableName() string {
-	return "nutrient"
+func (f Food) ToJSON() (*FoodJSON, error) {
+	var nutrient Nutrient
+	if has, err := factory.DB().Where("food_id = ?", f.Id).Get(&nutrient); err != nil {
+		return nil, err
+	} else if !has {
+		return nil, nil
+	}
+
+	// 브랜드는 없는 경우도 있을 수 있다.
+	var brand Brand
+	if _, err := factory.DB().ID(f.BrandId).Get(&brand); err != nil {
+		return nil, err
+	}
+
+	var category Category
+	if has, err := factory.DB().ID(f.CategoryId).Get(&category); err != nil {
+		return nil, err
+	} else if !has {
+		return nil, nil
+	}
+
+	return &FoodJSON{Food: f, Nutrient: nutrient, Brand: brand, Category: category}, nil
+}
+
+func (FoodJSON) NewFoodJSON(food Food, nutrient Nutrient, brand Brand, category Category) FoodJSON {
+	return FoodJSON{Food: food, Nutrient: nutrient, Brand: brand, Category: category}
 }
 
 func (f *Food) Create() (int64, error) {

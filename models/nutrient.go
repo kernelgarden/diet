@@ -16,8 +16,8 @@ type Nutrient struct {
 	TransFat       float32   `json:"trans_fat"`
 	PerWeight      int32     `json:"per_weight"`
 	Calorie        int64     `json:"calorie"`
-	CreatedAt      time.Time `json:"created_at" xorm:"created"`
-	DeletedAt      time.Time `json:"deleted_at" xorm:"deleted"`
+	CreatedAt      time.Time `json:"-" xorm:"created"`
+	DeletedAt      time.Time `json:"-" xorm:"deleted"`
 }
 
 func (n *Nutrient) Create() (int64, error) {
