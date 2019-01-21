@@ -27,13 +27,13 @@ func InitDB() (*xorm.Engine, error) {
 	var connection string
 	if c.Debug {
 		if c.Database.Host != "" {
-			connection = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s_dev?charset=utf8", c.Database.Username, c.Database.Password, c.Database.Host, c.Database.Password, c.Database.Name)
+			connection = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s_dev?charset=utf8", c.Database.Username, c.Database.Password, c.Database.Host, c.Database.Port, c.Database.Name)
 		} else {
 			connection = fmt.Sprintf("%s:%s@/%s_dev?charset=utf8", c.Database.Username, c.Database.Password, c.Database.Name)
 		}
 	} else {
 		if c.Database.Host != "" {
-			connection = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", c.Database.Username, c.Database.Password, c.Database.Host, c.Database.Password, c.Database.Name)
+			connection = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", c.Database.Username, c.Database.Password, c.Database.Host, c.Database.Port, c.Database.Name)
 		} else {
 			connection = fmt.Sprintf("%s:%s@/%s?charset=utf8", c.Database.Username, c.Database.Password, c.Database.Name)
 		}

@@ -2,8 +2,8 @@ database:
   driver: mysql
   username: root
   password: tabstorage
-  #host: kernelgarden-db.cmcuy239248x.ap-northeast-2.rds.amazonaws.com
-  #port: 3306
+  host: kernelgarden-db.cmcuy239248x.ap-northeast-2.rds.amazonaws.com
+  port: 3306
   name: diet
   logger:
   # kafka:
