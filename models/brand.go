@@ -14,15 +14,6 @@ type Brand struct {
 	DeletedAt  time.Time `json:"-" xorm:"deleted"`
 }
 
-type BrandFood struct {
-	Brand `xorm:"extends"`
-	Food  `xorm:"extends"`
-}
-
-func (BrandFood) TableName() string {
-	return "food"
-}
-
 func (b *Brand) Create() (int64, error) {
 	return factory.DB().Insert(b)
 }

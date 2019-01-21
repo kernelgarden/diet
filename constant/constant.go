@@ -8,6 +8,8 @@ type Config struct {
 		Driver   string
 		Username string
 		Password string
+		Host	 string
+		Port 	 string
 		Name     string
 		Logger   string
 	}

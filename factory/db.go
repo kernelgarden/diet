@@ -26,9 +26,17 @@ func InitDB() (*xorm.Engine, error) {
 	// Init DB
 	var connection string
 	if c.Debug {
-		connection = fmt.Sprintf("%s:%s@/%s_dev?charset=utf8", c.Database.Username, c.Database.Password, c.Database.Name)
+		if c.Database.Host != "" {
+			connection = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s_dev?charset=utf8", c.Database.Username, c.Database.Password, c.Database.Host, c.Database.Password, c.Database.Name)
+		} else {
+			connection = fmt.Sprintf("%s:%s@/%s_dev?charset=utf8", c.Database.Username, c.Database.Password, c.Database.Name)
+		}
 	} else {
-		connection = fmt.Sprintf("%s:%s@/%s?charset=utf8", c.Database.Username, c.Database.Password, c.Database.Name)
+		if c.Database.Host != "" {
+			connection = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", c.Database.Username, c.Database.Password, c.Database.Host, c.Database.Password, c.Database.Name)
+		} else {
+			connection = fmt.Sprintf("%s:%s@/%s?charset=utf8", c.Database.Username, c.Database.Password, c.Database.Name)
+		}
 	}
 
 	var driver string

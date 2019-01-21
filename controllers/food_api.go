@@ -309,6 +309,7 @@ func (FoodApiController) Update(ctx echo.Context) error {
 }
 
 func (FoodApiController) Test(ctx echo.Context) error {
+	/*
 	id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
 	if err != nil {
 		Fail(ctx, http.StatusBadRequest, factory.NewFailResp(constant.InvalidRequestFormat))
@@ -324,4 +325,6 @@ func (FoodApiController) Test(ctx echo.Context) error {
 	}
 
 	return Success(ctx, foods)
+	*/
+	return Success(ctx, nil)
 }
