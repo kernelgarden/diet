@@ -48,6 +48,7 @@ func main() {
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
 	e.Use(middleware.RequestID())
+	e.Use(middleware.Logger())
 
 	//TODO: Implement log system
 
