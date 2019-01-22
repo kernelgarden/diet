@@ -117,7 +117,7 @@ func (BrandApiController) GetPage(ctx echo.Context) error {
 
 type BrandCreateInput struct {
 	Name       string `json:"name" swagger:"desc(등록할 이름),required"`
-	ImgSrc     string `json:"img_url" swagger:"desc(등록할 이미지 주소),required"`
+	ImgUrl     string `json:"img_url" swagger:"desc(등록할 이미지 주소),required"`
 	CategoryId int64  `json:"category_id" swagger:"desc(등록할 카테고리 ID),required"`
 }
 
@@ -127,7 +127,7 @@ func (BrandApiController) Create(ctx echo.Context) error {
 		return Fail(ctx, http.StatusBadRequest, factory.NewFailResp(constant.InvalidRequestFormat))
 	}
 
-	newBrand := models.Brand{Name: input.Name, ImgSrc: input.ImgSrc, CategoryId: input.CategoryId}
+	newBrand := models.Brand{Name: input.Name, ImgSrc: input.ImgUrl, CategoryId: input.CategoryId}
 	_, err := newBrand.Create()
 	if err != nil {
 		return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.Unknown))

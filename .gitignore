@@ -1,3 +1,5 @@
 .idea/
 
 constant/secret.go
+
+config.yml
