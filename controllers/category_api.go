@@ -35,6 +35,10 @@ func (c CategoryApiController) Init(g echoswagger.ApiGroup) {
 	g.DELETE("", c.Delete).
 		AddParamQueryNested(CategoryDeleteInput{}).
 		AddResponse(http.StatusOK, "", nil, nil)
+
+	g.GET("/:id/foods", c.GetFoods).
+		AddParamQueryNested(CategoryGetFoodsInput{}).
+		AddResponse(http.StatusOK, "category에 속한 food의 리스트를 반환합니다.", CategoryGetFoodsOutput{}, nil)
 }
 
 type CategoryGetByIdInput struct {
@@ -129,6 +133,45 @@ func (CategoryApiController) Create(ctx echo.Context) error {
 	}
 
 	return Success(ctx, newCategory)
+}
+
+type CategoryGetFoodsInput struct {
+	Id	int64	`query:"id"`
+}
+type CategoryGetFoodsOutput struct {
+	FoodList []models.FoodJSON `json:"food_list"`
+}
+func (CategoryApiController) GetFoods(ctx echo.Context) error {
+	id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
+	if err != nil {
+		return Fail(ctx, http.StatusBadRequest, factory.NewFailResp(constant.InvalidRequestFormat))
+	}
+
+	category, err := models.Category{}.Get(id)
+	if err != nil {
+		return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.Unknown))
+	} else if category == nil {
+		return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.InExist))
+	}
+
+	foodList, err := category.Foods()
+	if err != nil {
+		return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.Unknown))
+	}
+
+	foodJSONList := make([]models.FoodJSON, len(foodList))
+	for idx, food := range foodList {
+		foodJson, err := food.ToJSON()
+		if err != nil {
+			return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.Unknown))
+		}
+
+		foodJSONList[idx] = *foodJson
+	}
+
+	result := CategoryGetFoodsOutput{FoodList: foodJSONList}
+
+	return Success(ctx, result)
 }
 
 type CategoryDeleteInput struct {

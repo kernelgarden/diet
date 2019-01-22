@@ -62,3 +62,12 @@ func (Category) Default() (*Category, error) {
 	_, err := factory.DB().ID(0).Get(&c)
 	return &c, err
 }
+
+func (c Category) Foods() ([]*Food, error) {
+	foods := make([]*Food, 0)
+	if err := factory.DB().Where("category_id = ?", c.Id).Find(&foods); err != nil {
+		return nil, err
+	}
+
+	return foods, nil
+}

@@ -58,3 +58,12 @@ func (Brand) Default() (*Brand, error) {
 
 	return &b, nil
 }
+
+func (b Brand) Foods() ([]*Food, error) {
+	foods := make([]*Food, 0)
+	if err := factory.DB().Where("brand_id = ?", b.Id).Find(&foods); err != nil {
+		return nil, err
+	}
+
+	return foods, nil
+}
