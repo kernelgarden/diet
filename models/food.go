@@ -51,6 +51,10 @@ func (FoodJSON) NewFoodJSON(food Food, nutrient Nutrient, brand Brand, category 
 	return FoodJSON{Food: food, Nutrient: nutrient, Brand: brand, Category: category}
 }
 
+func (FoodJSON) NewFoodJSONWithoutBrand(food Food, nutrient Nutrient, category Category) FoodJSON {
+	return FoodJSON{Food: food, Nutrient: nutrient, Category: category}
+}
+
 func (f *Food) Create() (int64, error) {
 	return factory.DB().Insert(f)
 }

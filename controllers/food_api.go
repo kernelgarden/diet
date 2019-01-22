@@ -136,7 +136,7 @@ func (FoodApiController) GetPage(ctx echo.Context) error {
 
 type FoodCreateInput struct {
 	CategoryId int64   `json:"CategoryId" swagger:"desc(생성할 food의 categoryId),required"`
-	BrandId    int64   `json:"BrandId" swagger:"desc(생성할 food의 brandId),required"`
+	BrandId    int64   `json:"BrandId" swagger:"desc(생성할 food의 brandId),allowEmpty"`
 	Name       string  `json:"Name" swagger:"desc(생성할 food의 이름),required"`
 	Weight     float64 `json:"Weight" swagger:"desc(생성할 food의 가중치),required"`
 
@@ -186,14 +186,23 @@ func (FoodApiController) Create(ctx echo.Context) error {
 		return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.InExist))
 	}
 
-	brand, err = models.Brand{}.Get(newFood.BrandId)
-	if err != nil {
-		return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.Unknown))
-	} else if category == nil {
-		return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.InExist))
+	// brand가 없는 경우도 있다.
+	if newFood.BrandId != 0 {
+		brand, err = models.Brand{}.Get(newFood.BrandId)
+		if err != nil {
+			return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.Unknown))
+		} else if category == nil {
+			return Fail(ctx, http.StatusInternalServerError, factory.NewFailResp(constant.InExist))
+		}
 	}
 
-	result := models.FoodJSON{}.NewFoodJSON(newFood, newNutrient, *brand, *category)
+	var result models.FoodJSON
+	if brand == nil {
+		result = models.FoodJSON{}.NewFoodJSONWithoutBrand(newFood, newNutrient, *category)
+	} else {
+		result = models.FoodJSON{}.NewFoodJSON(newFood, newNutrient, *brand, *category)
+	}
+
 
 	return Success(ctx, result)
 }
