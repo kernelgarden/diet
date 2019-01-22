@@ -59,7 +59,7 @@ func (CategoryApiController) GetById(ctx echo.Context) error {
 }
 
 type CategoryGetListInput struct {
-	IdList []int64 `json:"id_list" swagger:"desc(조회할 category ID 리스트),required"`
+	IdList []int64 `json:"IdList" swagger:"desc(조회할 category ID 리스트),required"`
 }
 type CategoryGetListOutput struct {
 	CategoryList []*models.Category `json:"category_list"`
@@ -113,7 +113,7 @@ func (CategoryApiController) GetPage(ctx echo.Context) error {
 }
 
 type CategoryCreateInput struct {
-	Name string `json:"name" swagger:"desc(생성할 category의 이름),required"`
+	Name string `json:"Name" swagger:"desc(생성할 category의 이름),required"`
 }
 
 func (CategoryApiController) Create(ctx echo.Context) error {
@@ -150,7 +150,7 @@ func (CategoryApiController) Delete(ctx echo.Context) error {
 }
 
 type CategoryUpdateInput struct {
-	Name string `json:"name" swagger:"desc(변경할 category 이름(보내지 않으면 적용X)),allowEmpty"`
+	Name string `json:"Name" swagger:"desc(변경할 category 이름(보내지 않으면 적용X)),allowEmpty"`
 }
 
 func (CategoryApiController) Update(ctx echo.Context) error {

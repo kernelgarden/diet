@@ -62,7 +62,7 @@ func (BrandApiController) GetById(ctx echo.Context) error {
 }
 
 type BrandGetListInput struct {
-	IdList []int64 `json:"id_list" swagger:"desc(조회할 대상의 ID 리스트),required"`
+	IdList []int64 `json:"IdList" swagger:"desc(조회할 대상의 ID 리스트),required"`
 }
 type BrandGetListOutput struct {
 	BrandList []*models.Brand `json:"brand_list"`
@@ -116,9 +116,9 @@ func (BrandApiController) GetPage(ctx echo.Context) error {
 }
 
 type BrandCreateInput struct {
-	Name       string `json:"name" swagger:"desc(등록할 이름),required"`
-	ImgUrl     string `json:"img_url" swagger:"desc(등록할 이미지 주소),required"`
-	CategoryId int64  `json:"category_id" swagger:"desc(등록할 카테고리 ID),required"`
+	Name       string `json:"Name" swagger:"desc(등록할 이름),required"`
+	ImgUrl     string `json:"ImgUrl" swagger:"desc(등록할 이미지 주소),required"`
+	CategoryId int64  `json:"CategoryId" swagger:"desc(등록할 카테고리 ID),required"`
 }
 
 func (BrandApiController) Create(ctx echo.Context) error {
@@ -155,9 +155,9 @@ func (BrandApiController) Delete(ctx echo.Context) error {
 }
 
 type BrandUpdateInput struct {
-	Name       string `json:"name" swagger:"desc(변경할 이름(보내지 않으면 적용 X)),allowEmpty"`
-	ImgSrc     string `json:"img_url" swagger:"desc(변경할 이미지 주소(보내지 않으면 적용 X)),allowEmpty"`
-	CategoryId int64  `json:"category_id" swagger:"desc(변경할 카테고리 ID(보내지 않으면 적용 X)),allowEmpty"`
+	Name       string `json:"Name" swagger:"desc(변경할 이름(보내지 않으면 적용 X)),allowEmpty"`
+	ImgSrc     string `json:"ImgUrl" swagger:"desc(변경할 이미지 주소(보내지 않으면 적용 X)),allowEmpty"`
+	CategoryId int64  `json:"CategoryId" swagger:"desc(변경할 카테고리 ID(보내지 않으면 적용 X)),allowEmpty"`
 }
 
 func (BrandApiController) Update(ctx echo.Context) error {

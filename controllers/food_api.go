@@ -40,7 +40,7 @@ func (f FoodApiController) Init(g echoswagger.ApiGroup) {
 }
 
 type FoodGetByIdInput struct {
-	Id int64 `json:"id" swagger:"desc(조회할 food의 id),required"`
+	Id int64 `query:"Id" swagger:"desc(조회할 food의 id),required"`
 }
 
 func (FoodApiController) GetById(ctx echo.Context) error {
@@ -66,7 +66,7 @@ func (FoodApiController) GetById(ctx echo.Context) error {
 }
 
 type FoodGetListInput struct {
-	IdList []int64 `json:"id_list" swagger:"desc(조회할 food의 ID 리스트),required"`
+	IdList []int64 `json:"IdList" swagger:"desc(조회할 food의 ID 리스트),required"`
 }
 type FoodGetListOutput struct {
 	FoodList []models.FoodJSON `json:"food_list"`
@@ -135,18 +135,18 @@ func (FoodApiController) GetPage(ctx echo.Context) error {
 }
 
 type FoodCreateInput struct {
-	CategoryId int64   `json:"category_id" swagger:"desc(생성할 food의 categoryId),required"`
-	BrandId    int64   `json:"brand_id" swagger:"desc(생성할 food의 brandId),required"`
-	Name       string  `json:"name" swagger:"desc(생성할 food의 이름),required"`
-	Weight     float64 `json:"weight" swagger:"desc(생성할 food의 가중치),required"`
+	CategoryId int64   `json:"CategoryId" swagger:"desc(생성할 food의 categoryId),required"`
+	BrandId    int64   `json:"BrandId" swagger:"desc(생성할 food의 brandId),required"`
+	Name       string  `json:"Name" swagger:"desc(생성할 food의 이름),required"`
+	Weight     float64 `json:"Weight" swagger:"desc(생성할 food의 가중치),required"`
 
-	Carbohydrate   float32 `json:"carbohydrate" swagger:"desc(생성할 food의 탄수화물(g)),required"`
-	Protein        float32 `json:"protein" swagger:"desc(생성할 food의 단백질(g)),required"`
-	SaturatedFat   float32 `json:"saturated_fat" swagger:"desc(생성할 food의 포화지방(g)),required"`
-	UnSaturatedFat float32 `json:"unsaturated_fat" swagger:"desc(생성할 food의 불포화지방(g)),required"`
-	TransFat       float32 `json:"trans_fat" swagger:"desc(생성할 food의 트랜스지방(g)),required"`
-	PerWeight      int32   `json:"per_weight" swagger:"desc(생성할 food의 중량(g)),required"`
-	Calorie        int64   `json:"calorie" swagger:"desc(생성할 food의 칼로리(kcal)),required"`
+	Carbohydrate   float32 `json:"Carbohydrate" swagger:"desc(생성할 food의 탄수화물(g)),required"`
+	Protein        float32 `json:"Protein" swagger:"desc(생성할 food의 단백질(g)),required"`
+	SaturatedFat   float32 `json:"SaturatedFat" swagger:"desc(생성할 food의 포화지방(g)),required"`
+	UnSaturatedFat float32 `json:"UnSaturatedFat" swagger:"desc(생성할 food의 불포화지방(g)),required"`
+	TransFat       float32 `json:"TransFat" swagger:"desc(생성할 food의 트랜스지방(g)),required"`
+	PerWeight      int32   `json:"PerWeight" swagger:"desc(생성할 food의 중량(g)),required"`
+	Calorie        int64   `json:"Calorie" swagger:"desc(생성할 food의 칼로리(kcal)),required"`
 }
 
 func (FoodApiController) Create(ctx echo.Context) error {
@@ -217,18 +217,18 @@ func (FoodApiController) Delete(ctx echo.Context) error {
 }
 
 type FoodUpdateInput struct {
-	CategoryId int64   `json:"category_id" swagger:"desc(변경할 categoryId(보내지 않으면 적용X)),allowEmpty"`
-	BrandId    int64   `json:"brand_id" swagger:"desc(변경할 brandId(보내지 않으면 적용X),allowEmpty"`
-	Name       string  `json:"name" swagger:"desc(변경할 이름(보내지 않으면 적용X),allowEmpty"`
-	Weight     float64 `json:"weight" swagger:"desc(변경할 가중치(보내지 않으면 적용X)),allowEmpty"`
+	CategoryId int64   `json:"CategoryId" swagger:"desc(변경할 categoryId(보내지 않으면 적용X)),allowEmpty"`
+	BrandId    int64   `json:"BrandId" swagger:"desc(변경할 brandId(보내지 않으면 적용X),allowEmpty"`
+	Name       string  `json:"Name" swagger:"desc(변경할 이름(보내지 않으면 적용X),allowEmpty"`
+	Weight     float64 `json:"Weight" swagger:"desc(변경할 가중치(보내지 않으면 적용X)),allowEmpty"`
 
-	Carbohydrate   float32 `json:"carbohydrate" swagger:"desc(생성할 food의 탄수화물(g)),allowEmpty"`
-	Protein        float32 `json:"protein" swagger:"desc(생성할 food의 단백질(g)),allowEmpty"`
-	SaturatedFat   float32 `json:"saturated_fat" swagger:"desc(생성할 food의 포화지방(g)),allowEmpty"`
-	UnSaturatedFat float32 `json:"unsaturated_fat" swagger:"desc(생성할 food의 불포화지방(g)),allowEmpty"`
-	TransFat       float32 `json:"trans_fat" swagger:"desc(생성할 food의 트랜스지방(g)),allowEmpty"`
-	PerWeight      int32   `json:"per_weight" swagger:"desc(생성할 food의 중량(g)),allowEmpty"`
-	Calorie        int64   `json:"calorie" swagger:"desc(생성할 food의 칼로리(kcal)),allowEmpty"`
+	Carbohydrate   float32 `json:"Carbohydrate" swagger:"desc(생성할 food의 탄수화물(g)),allowEmpty"`
+	Protein        float32 `json:"Protein" swagger:"desc(생성할 food의 단백질(g)),allowEmpty"`
+	SaturatedFat   float32 `json:"SaturatedFat" swagger:"desc(생성할 food의 포화지방(g)),allowEmpty"`
+	UnSaturatedFat float32 `json:"UnSaturatedFat" swagger:"desc(생성할 food의 불포화지방(g)),allowEmpty"`
+	TransFat       float32 `json:"TransFat" swagger:"desc(생성할 food의 트랜스지방(g)),allowEmpty"`
+	PerWeight      int32   `json:"PerWeight" swagger:"desc(생성할 food의 중량(g)),allowEmpty"`
+	Calorie        int64   `json:"Calorie" swagger:"desc(생성할 food의 칼로리(kcal)),allowEmpty"`
 }
 
 func (FoodApiController) Update(ctx echo.Context) error {
