@@ -6,10 +6,10 @@ import (
 )
 
 type Brand struct {
-	Id         int64     `json:"id"`
-	Name       string    `json:"name"`
-	ImgSrc     string    `json:"img_url"`
-	CategoryId int64     `json:"category_id"`
+	Id         int64     `json:"Id"`
+	Name       string    `json:"Name"`
+	ImgSrc     string    `json:"ImgSrc"`
+	CategoryId int64     `json:"CategoryId"`
 	CreatedAt  time.Time `json:"-" xorm:"created"`
 	DeletedAt  time.Time `json:"-" xorm:"deleted"`
 }

@@ -7,15 +7,16 @@ import (
 )
 
 type Nutrient struct {
-	Id             int64     `json:"id" xorm:"pk autoincr"`
-	FoodId         int64     `json:"food_id" xorm:"index"`
-	Carbohydrate   float32   `json:"carbohydrate"`
-	Protein        float32   `json:"protein"`
-	SaturatedFat   float32   `json:"saturated_fat"`
-	UnSaturatedFat float32   `json:"unsaturated_fat"`
-	TransFat       float32   `json:"trans_fat"`
-	PerWeight      int32     `json:"per_weight"`
-	Calorie        int64     `json:"calorie"`
+	Id             int64     `json:"Id" xorm:"pk autoincr"`
+	FoodId         int64     `json:"FoodId" xorm:"index"`
+	Carbohydrate   float32   `json:"Carbohydrate"`
+	Protein        float32   `json:"Protein"`
+	SaturatedFat   float32   `json:"SaturatedFat"`
+	UnSaturatedFat float32   `json:"UnSaturatedFat"`
+	TransFat       float32   `json:"TransFat"`
+	PerUnit 	   int32     `json:"PerUnit"`
+	Calorie        int64     `json:"Calorie"`
+	Unit		   int32	 `json:"Unit"`
 	CreatedAt      time.Time `json:"-" xorm:"created"`
 	DeletedAt      time.Time `json:"-" xorm:"deleted"`
 }

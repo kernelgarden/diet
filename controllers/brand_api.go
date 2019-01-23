@@ -100,7 +100,7 @@ type BrandGetPageInput struct {
 	Offset int `query:"offset" swagger:"desc(조회를 시작할 offset),required"`
 }
 type BrandGetPageOutput struct {
-	BrandList []*models.Brand `json:"brand_list"`
+	BrandList []*models.Brand `json:"BrandList"`
 }
 
 func (BrandApiController) GetPage(ctx echo.Context) error {
@@ -123,7 +123,7 @@ type BrandGetFoodsInput struct {
 	Id	int64	`query:"id"`
 }
 type BrandGetFoodsOutput struct {
-	FoodList []models.FoodJSON `json:"food_list"`
+	FoodList []models.FoodJSON `json:"FoodList"`
 }
 func (BrandApiController) GetFoods(ctx echo.Context) error {
 	id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)

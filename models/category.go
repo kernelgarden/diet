@@ -6,8 +6,8 @@ import (
 )
 
 type Category struct {
-	Id        int64     `json:"id"`
-	Name      string    `json:"name"`
+	Id        int64     `json:"Id"`
+	Name      string    `json:"Name"`
 	CreatedAt time.Time `json:"-" xorm:"created"`
 	DeletedAt time.Time `json:"-" xorm:"deleted"`
 }

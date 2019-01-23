@@ -66,7 +66,7 @@ type CategoryGetListInput struct {
 	IdList []int64 `json:"IdList" swagger:"desc(조회할 category ID 리스트),required"`
 }
 type CategoryGetListOutput struct {
-	CategoryList []*models.Category `json:"category_list"`
+	CategoryList []*models.Category `json:"CategoryList"`
 }
 
 func (CategoryApiController) GetList(ctx echo.Context) error {
@@ -97,7 +97,7 @@ type CategoryGetPageInput struct {
 	Offset int `query:"offset" swagger:"desc(조회를 시작할 offset),required"`
 }
 type CategoryGetPageOutput struct {
-	CategoryList []*models.Category `json:"category_list"`
+	CategoryList []*models.Category `json:"CategoryList"`
 }
 
 func (CategoryApiController) GetPage(ctx echo.Context) error {

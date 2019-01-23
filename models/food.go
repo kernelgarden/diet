@@ -7,20 +7,20 @@ import (
 )
 
 type Food struct {
-	Id         int64     `json:"id" xorm:"pk autoincr"`
-	CategoryId int64     `json:"category_id" xorm:"index"`
-	BrandId    int64     `json:"brand_id" xorm:"index"`
-	Name       string    `json:"name" xorm:"varchar(64)"`
-	Weight     float64   `json:"weight"`
+	Id         int64     `json:"Id" xorm:"pk autoincr"`
+	CategoryId int64     `json:"CategoryId" xorm:"index"`
+	BrandId    int64     `json:"BrandId" xorm:"index"`
+	Name       string    `json:"Name" xorm:"varchar(64)"`
+	Weight     float64   `json:"-"`
 	CreatedAt  time.Time `json:"-" xorm:"created"`
 	DeletedAt  time.Time `json:"-" xorm:"deleted"`
 }
 
 type FoodJSON struct {
-	Food     Food     `json:"food"`
-	Nutrient Nutrient `json:"nutrient"`
-	Brand    Brand    `json:"brand"`
-	Category Category `json:"category"`
+	Food     Food     `json:"Food"`
+	Nutrient Nutrient `json:"Nutrient"`
+	Brand    Brand    `json:"Brand"`
+	Category Category `json:"Category"`
 }
 
 func (f Food) ToJSON() (*FoodJSON, error) {

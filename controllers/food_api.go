@@ -69,7 +69,7 @@ type FoodGetListInput struct {
 	IdList []int64 `json:"IdList" swagger:"desc(조회할 food의 ID 리스트),required"`
 }
 type FoodGetListOutput struct {
-	FoodList []models.FoodJSON `json:"food_list"`
+	FoodList []models.FoodJSON `json:"FoodList"`
 }
 
 func (FoodApiController) GetList(ctx echo.Context) error {
@@ -105,7 +105,7 @@ type FoodGetPageInput struct {
 	Offset int `query:"offset" swagger:"desc(조회를 시작할 offset),required"`
 }
 type FoodGetPageOutput struct {
-	FoodList []models.FoodJSON `json:"food_list"`
+	FoodList []models.FoodJSON `json:"FoodList"`
 }
 
 func (FoodApiController) GetPage(ctx echo.Context) error {
@@ -145,8 +145,9 @@ type FoodCreateInput struct {
 	SaturatedFat   float32 `json:"SaturatedFat" swagger:"desc(생성할 food의 포화지방(g)),required"`
 	UnSaturatedFat float32 `json:"UnSaturatedFat" swagger:"desc(생성할 food의 불포화지방(g)),required"`
 	TransFat       float32 `json:"TransFat" swagger:"desc(생성할 food의 트랜스지방(g)),required"`
-	PerWeight      int32   `json:"PerWeight" swagger:"desc(생성할 food의 중량(g)),required"`
+	PerUnit        int32   `json:"PerUnit" swagger:"desc(생성할 food의 양(Unit)),required"`
 	Calorie        int64   `json:"Calorie" swagger:"desc(생성할 food의 칼로리(kcal)),required"`
+	Unit		   int32   `json:"Unit" swagger:"desc(생성할 food의 단위),required"`
 }
 
 func (FoodApiController) Create(ctx echo.Context) error {
@@ -157,7 +158,7 @@ func (FoodApiController) Create(ctx echo.Context) error {
 
 	newFood := models.Food{CategoryId: input.CategoryId, BrandId: input.BrandId, Name: input.Name, Weight: input.Weight}
 	newNutrient := models.Nutrient{Carbohydrate: input.Carbohydrate, Protein: input.Protein, SaturatedFat: input.SaturatedFat,
-		UnSaturatedFat: input.UnSaturatedFat, TransFat: input.TransFat, PerWeight: input.PerWeight, Calorie: input.Calorie}
+		UnSaturatedFat: input.UnSaturatedFat, TransFat: input.TransFat, PerUnit: input.PerUnit, Calorie: input.Calorie, Unit: input.Unit}
 
 	err := factory.Transaction(func(session *xorm.Session) error {
 		if _, err := newFood.CreateWithSes(session); err != nil {
@@ -236,8 +237,9 @@ type FoodUpdateInput struct {
 	SaturatedFat   float32 `json:"SaturatedFat" swagger:"desc(생성할 food의 포화지방(g)),allowEmpty"`
 	UnSaturatedFat float32 `json:"UnSaturatedFat" swagger:"desc(생성할 food의 불포화지방(g)),allowEmpty"`
 	TransFat       float32 `json:"TransFat" swagger:"desc(생성할 food의 트랜스지방(g)),allowEmpty"`
-	PerWeight      int32   `json:"PerWeight" swagger:"desc(생성할 food의 중량(g)),allowEmpty"`
+	PerUnit        int32   `json:"PerUnit" swagger:"desc(생성할 food의 양(Unit)),allowEmpty"`
 	Calorie        int64   `json:"Calorie" swagger:"desc(생성할 food의 칼로리(kcal)),allowEmpty"`
+	Unit		   int32   `json:"Unit" swagger:"desc(생성할 food의 단위),allowEmpty"`
 }
 
 func (FoodApiController) Update(ctx echo.Context) error {
@@ -292,11 +294,14 @@ func (FoodApiController) Update(ctx echo.Context) error {
 	if input.TransFat > 0 {
 		nutrient.TransFat = input.TransFat
 	}
-	if input.PerWeight != 0 {
-		nutrient.PerWeight = input.PerWeight
+	if input.PerUnit != 0 {
+		nutrient.PerUnit = input.PerUnit
 	}
 	if input.Calorie != 0 {
 		nutrient.Calorie = input.Calorie
+	}
+	if input.Unit != 0 {
+		nutrient.Unit = input.Unit
 	}
 
 	err = factory.Transaction(func(session *xorm.Session) error {
